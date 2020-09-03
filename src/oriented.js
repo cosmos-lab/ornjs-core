@@ -1,6 +1,6 @@
 "use strict";
 
-/**
+/** 
  * v2.0.0 Sep 4 2020
  * Achieve 'Dynamic HTML' on demand at browser side.
  * Parse inline or external file HTML template with a Javascript 'Class' object as scope.
