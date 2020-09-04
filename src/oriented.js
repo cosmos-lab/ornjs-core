@@ -1,8 +1,10 @@
 "use strict";
 
 /**
+ * 
+ * https://github.com/dynamite-js/core
  * v2.0.0 Sep 4 2020
- * Achieve 'Dynamic HTML' on demand at browser side.
+ * Achieve data driven dynamic HTML with the power of ECMAScript.
  * Parse inline or external file HTML template with a Javascript 'Class' object as scope.
  * Insert generated HTML to the container provided
  * @param  {Object} container String selector or reference of DOM object.
@@ -132,8 +134,6 @@ const Orn = async(selector, scope, template) => {
 };
 
 class OrnTemplate {
-
-    static cache
 
     constructor(template) {
 
@@ -295,6 +295,8 @@ class OrnTemplate {
     }
 
 }
+
+OrnTemplate.cache = {};
 
 class OrnCollection extends Array {
 
@@ -1461,8 +1463,7 @@ const SleepUntil = function(c) {
 })();
 
 /*
- * Orn.js beta v2.0.0 (Sep 4 2020)
- * https://github.com/orientedjs
+ * Orn.js beta v2.0.0 Sep 4 2020 * 
  * First draft of beta version on July 27, 2020. Please report any bug at github.com/cosmos-lab
  * Constant contributors github.com/cosmos-lab & github.com/fraggys
  *
