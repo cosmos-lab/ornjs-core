@@ -2,7 +2,7 @@
 
 /**
  * 
- * https://github.com/dynamite-js/core
+ * https://github.com/dynamite-js/core 
  * v2.0.0 Sep 4 2020
  * Achieve data driven dynamic HTML with the power of ECMAScript.
  * Parse inline or external file HTML template with a Javascript 'Class' object as scope.
@@ -1379,7 +1379,7 @@ const LazyLoad = async function(resource) {
 
     var src = resource;
 
-    if (src[src.length - 3] + src[src.length - 2] + src[src.length - 1] == 'css') {
+    if (src.match(/\.css/)) {
 
         if (!document.querySelector('link[href="' + src + '"]')) {
             const css = document.createElement('link');
