@@ -1,7 +1,6 @@
 "use strict";
 
-/** 
- * v2.0.0 Sep 4 2020
+/**
  * Achieve 'Dynamic HTML' on demand at browser side.
  * Parse inline or external file HTML template with a Javascript 'Class' object as scope.
  * Insert generated HTML to the container provided
@@ -132,8 +131,6 @@ const Orn = async(selector, scope, template) => {
 };
 
 class OrnTemplate {
-
-    static cache
 
     constructor(template) {
 
@@ -295,6 +292,8 @@ class OrnTemplate {
     }
 
 }
+
+OrnTemplate.cache = {};
 
 class OrnCollection extends Array {
 
@@ -1461,8 +1460,8 @@ const SleepUntil = function(c) {
 })();
 
 /*
- * Orn.js beta v2.0.0 (Sep 4 2020)
- * https://github.com/orientedjs
+ * Orn.js beta v0.1.0
+ * https://github.com/dynamite-js/core*
  * First draft of beta version on July 27, 2020. Please report any bug at github.com/cosmos-lab
  * Constant contributors github.com/cosmos-lab & github.com/fraggys
  *
