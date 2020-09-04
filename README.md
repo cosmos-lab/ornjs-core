@@ -1,2 +1,2 @@
 # core
-Base library
+https://orientedjs.com/
