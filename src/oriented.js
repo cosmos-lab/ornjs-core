@@ -669,8 +669,7 @@ class OrnCollection extends Array {
 class OrnParser {
 
     /**
-     * Ornmically generate HTML in container from an inline or external template provided with a Javascript object as scope.
-     * 
+     * HTML Template Parser
      * @param  {Object} node  - OrnTemplate node. Representation of DOM in Javascript Object
      * @param  {Object} parent - OrnTemplate node
      * @param  {Integer} index - index of node inside parent.children
@@ -1442,7 +1441,7 @@ const SleepUntil = function(c) {
 
 (() => {
 
-    Orn.debug = 0;
+    Orn.debug = false;
 
     OrnTemplate.cache = {};
 
