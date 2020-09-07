@@ -1441,7 +1441,7 @@ const SleepUntil = function(c) {
 
 (() => {
 
-    Orn.debug = 0;
+    Orn.debug = false;
 
     OrnTemplate.cache = {};
 
