@@ -1459,7 +1459,18 @@ const SleepUntil = function(c) {
 
     }, 50);
 
+    if (typeof Selector == 'undefined') {
+
+        window.Selector = (selector) => {
+
+            return new OrnCollection(selector);
+
+        };
+    }
+
 })();
+
+
 
 /*
  * Orn.js beta v2.0.0 Sep 4 2020 * 
