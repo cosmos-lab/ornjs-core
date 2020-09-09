@@ -45,7 +45,7 @@ const Orns = (selector, scope, template) => {
 
     return container;
 
-};
+}
 
 const Orn = async(selector, scope, template) => {
 
@@ -87,7 +87,7 @@ const Orn = async(selector, scope, template) => {
         }
 
         if (element.attr('src')) {
-            await LazyLoad(element.attr('src'));
+            await Orn.Include(element.attr('src'));
             element.attr('src', false, true);
         }
 
@@ -131,7 +131,88 @@ const Orn = async(selector, scope, template) => {
 
     return container;
 
+}
+
+/**
+ * Lazy Load a javascript or css
+ * @param  {String} resouce resouce path or array of resouce path
+ */
+
+Orn.Include = async(resource) => {
+
+    if (!Orn.Include.queue) {
+        Orn.Include.queue = {};
+    }
+
+    if (typeof resource != 'string') {
+        for (var i = 0; i < resource.length; i++) {
+            await Orn.Include(resource[i]);
+        }
+        return;
+    }
+
+    var src = resource;
+
+    if (src.match(/\.css/)) {
+
+        if (!document.querySelector('link[href="' + src + '"]')) {
+            const css = document.createElement('link');
+            css.type = "text/css";
+            css.rel = "stylesheet";
+            css.href = src;
+            new OrnCollection('head').append(css);
+        }
+
+        return;
+    }
+
+    var srctag = document.querySelector('script[src="' + src + '"]');
+
+    if (srctag) {
+        await new Promise((resolve, reject) => {
+            Orn.Sleep(function() {
+                var Loaded = typeof Orn.Include.queue[src] == 'undefined';
+                if (!Loaded) {
+                    if (Orn.Include.queue[src] == 'ERROR') {
+                        reject();
+                        srctag.parentNode.removeChild(srctag);
+                        return true;
+                    }
+                    return false;
+                }
+                resolve();
+                return true;
+            });
+        });
+        return;
+    }
+
+    await new Promise((resolve, reject) => {
+        Orn.Include.queue[src] = true;
+        const script = document.createElement('script');
+        script.onload = function() {
+            delete Orn.Include.queue[src];
+            resolve();
+        };
+        script.onerror = function() {
+            Orn.Include.queue[src] = 'ERROR';
+            reject();
+        };
+        script.async = true;
+        document.body.appendChild(script);
+        script.src = src;
+    });
+
 };
+
+Orn.Sleep = (c) => {
+    if (c()) {
+        return;
+    }
+    setTimeout(function() {
+        Orn.Sleep(c);
+    });
+}
 
 class OrnTemplate {
 
@@ -184,7 +265,7 @@ class OrnTemplate {
                 Wait for all request until first templates loads to OrnTemplate.cache[template] 
             */
             await new Promise((resolve, reject) => {
-                SleepUntil(function() {
+                Orn.Sleep(function() {
                     var Loaded = OrnTemplate.cache[template] !== true;
                     if (!Loaded) {
                         return false;
@@ -295,8 +376,6 @@ class OrnTemplate {
     }
 
 }
-
-OrnTemplate.cache = {};
 
 class OrnCollection extends Array {
 
@@ -1357,88 +1436,162 @@ class OrnParser {
 
 }
 
+class FetchWrapper {
+
+    /**
+     * 
+     * https://github.com/orientedjs/core 
+     * A wrapper for javascript fetch
+     * @param  {String} url .
+     * @param  {JSON Object} param (Optional) Parameters in key value pair format object.
+     * @param  {Object} config (Optional)
+     *  config = {
+     *      post:true //Only if you want to post data or ignore 'post:true'
+     * }
+     */
+
+    constructor(url, param, config) {
+
+        if (typeof param == 'undefined') {
+            param = {};
+        }
+
+        if (typeof config == 'undefined') {
+            config = {};
+        }
+
+        if (config.noerror) {
+            this.noerror = true;
+        }
+
+        this.url = url;
+
+        this.config = {
+            headers: {},
+            credentials: 'same-origin'
+        };
+
+        if (typeof AbortController != 'undefined') {
+
+            this.controller = new AbortController();
+            this.config.signal = this.controller.signal;
+
+        }
+
+        if (config.post) {
+            this.config.method = 'POST';
+            this.config.body = Fetch.FD(param);
+        } else {
+            this.url = `${this.url}${(this.url.indexOf('?') == -1 ? '?' : '&')}${Fetch.QS(param)}`;
+        }
+
+        if (config.offline) {
+            this.config.headers.offline = true;
+        }
+
+        if (config.persist) {
+            this.config.headers.persist = true;
+        }
+
+    }
+
+    Abort() {
+        this.controller && this.controller.abort();
+    }
+
+    async Load() {
+
+        var response = false;
+
+        try {
+            response = await fetch(this.url, this.config);
+            if (!response.ok) {
+                throw Error();
+            }
+            if (response.headers.get("content-type") == "application/json") {
+                response = await response.json();
+            } else {
+                response = await response.text();
+            }
+        } catch (e) {}
+
+        return response;
+
+    };
+
+}
+
+var HashPath = () => {
+    return location.hash.substring(1, location.hash.length).split('/');
+}
+
+var Selector = (selector) => {
+
+    return new OrnCollection(selector);
+
+}
+
 /**
- * Lazy Load a javascript or css
- * @param  {String} resouce resouce path or array of resouce path
+ * #1 Get a Fetch Object
+ * const request = Fetch('/service/some_url',{
+ *      name:'Tony Stark'
+ * },{
+ *      post:true //Only if you want to post data or ignore 'post:true'
+ * });
+ * 
+ * #2 Send request
+ * const responce = await request.Load();
+ * 
+ * #3 Abort request in case you want
+ * request.Abort();
+ * 
  */
+var Fetch = (url, param, config) => {
+    return new FetchWrapper(url, param, config);
+};
 
-const LazyLoad = async function(resource) {
+Fetch.QS = (data, parentKey, fd) => {
 
-    if (!LazyLoad.queue) {
-        LazyLoad.queue = {};
+    if (typeof fd == 'undefined') {
+        fd = [];
     }
-
-    if (typeof resource != 'string') {
-        for (var i = 0; i < resource.length; i++) {
-            await LazyLoad(resource[i]);
-        }
-        return;
-    }
-
-    var src = resource;
-
-    if (src.match(/\.css/)) {
-
-        if (!document.querySelector('link[href="' + src + '"]')) {
-            const css = document.createElement('link');
-            css.type = "text/css";
-            css.rel = "stylesheet";
-            css.href = src;
-            new OrnCollection('head').append(css);
-        }
-
-        return;
-    }
-
-    var srctag = document.querySelector('script[src="' + src + '"]');
-
-    if (srctag) {
-        await new Promise((resolve, reject) => {
-            SleepUntil(function() {
-                var Loaded = typeof LazyLoad.queue[src] == 'undefined';
-                if (!Loaded) {
-                    if (LazyLoad.queue[src] == 'ERROR') {
-                        reject();
-                        srctag.parentNode.removeChild(srctag);
-                        return true;
-                    }
-                    return false;
-                }
-                resolve();
-                return true;
-            });
+    if (data && typeof data === 'object' && !(data instanceof Date) && !(data instanceof File)) {
+        Object.keys(data).forEach(key => {
+            Fetch.QS(data[key], parentKey ? `${parentKey}[${key}]` : key, fd);
         });
-        return;
+    } else {
+        const value = data == null ? '' : data;
+        fd.push(`${parentKey}=${value}`);
     }
-
-    await new Promise((resolve, reject) => {
-        LazyLoad.queue[src] = true;
-        const script = document.createElement('script');
-        script.onload = function() {
-            delete LazyLoad.queue[src];
-            resolve();
-        };
-        script.onerror = function() {
-            LazyLoad.queue[src] = 'ERROR';
-            reject();
-        };
-        script.async = true;
-        document.body.appendChild(script);
-        script.src = src;
-    });
+    if (!parentKey) {
+        fd = fd.join('&');
+    }
+    return fd;
 
 };
 
-const SleepUntil = function(c) {
-    if (c()) {
-        return;
+Fetch.FD = (data, parentKey, fd) => {
+
+    if (typeof fd == 'undefined') {
+        fd = new FormData();
     }
-    setTimeout(function() {
-        SleepUntil(c);
-    });
+
+    if (data && typeof data === 'object' && !(data instanceof Date) && !(data instanceof File)) {
+        Object.keys(data).forEach(key => {
+            Fetch.FD(data[key], parentKey ? `${parentKey}[${key}]` : key, fd);
+        });
+    } else {
+        const value = data == null ? '' : data;
+        fd.append(parentKey, value);
+    }
+
+    return fd;
+
 };
 
 (() => {
+
+    OrnTemplate.cache = {};
 
     Orn.debug = false;
 
@@ -1457,15 +1610,6 @@ const SleepUntil = function(c) {
         }
 
     }, 50);
-
-    if (typeof Selector == 'undefined') {
-
-        window.Selector = (selector) => {
-
-            return new OrnCollection(selector);
-
-        };
-    }
 
 })();
 
