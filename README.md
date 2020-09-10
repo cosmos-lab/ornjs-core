@@ -13,6 +13,8 @@ Orn(container,scope,template) method will load html template over HTTP and rende
 
 - Gives you more control over your UI architecture to design it in your own ways, because most of the application is driven by your ECMAScript classes. ORN is just to create a dynamic HTML into a container from scope data ('this' or any javascript object) & HTML template (inline or external *.html file).
 
+- Mix it with any stack of your existing project without making too much changes. e.g. Achieve data driven HTML in php, wordpress based websites or any PWA...
+
 ## Sample Template
 ```
 <div id="my-container" orn-module="my-item-list">
