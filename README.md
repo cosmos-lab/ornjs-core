@@ -11,16 +11,84 @@ A radical approach to plan HTML based UI...
 
 #Gives you more control over your UI architecture to design it in your own ways, because most of the application is driven by your ECMAScript classes. ORN is just to create a dynamic HTML into a container from scope data ('this' or any javascript object) & HTML template (inline or external *.html file).
 
-Few examples of Orn function usuage
+## Sample Template
+```
+<div id="my-container" orn-module="my-item-list">
+    <div>
+        <div orn-repeat="data.list as i:item">
+            <div class="skl-d-flex skl-mt-3">
+                <!-- 
+                    make any html tag's attribute data driven by adding prefix 'orn-'
+                    orn-value="item.value" will be render as value="Pre Filled Item 1" where i=0 and item={value: 'Pre Filled Item 1'}
+                -->
+                <input type="text" orn-value="item.value" orn-model="item.value" orn-placeholder="`Enter List Item ${i+1}`" class="input skl-p-3 skl-pt-2 skl-pb-2" />
+                <a orn-onclick="RemoveItem(i)" class="float-right skl-p-3 skl-pt-2 skl-pb-2 text-large">&#10006;</a>
+            </div>
 
-//Load via external template
-await Orn('#my-div',{key:value},'template.html');
-await Orn(my_dom_object,{key:value},'template.html');
-await Orn(my_dom_object,this,'template.html');
+        </div>
+    </div>
+    <!-- 
+        orn-onclick="AddItem()" is alias or orn-onclick="this.AddItem()" both syntaxes are applicable
+        in this way any event type handler could be attached by 'orn-' prefix before any event attribute
+        e.g. onmouseover="" to orn-onmouseover="" 
+    -->
+    <a class="button bg-button skl-p-3 skl-pt-2 skl-pb-2 skl-d-inline-block skl-mt-3" orn-onclick="AddItem()">
+       Add Item<span></span>
+    </a>
+</div>
+```
+## A Javascript Class
 
-//orn-module or inline template
-Orn('#my-div',{key:value});
-Orn(my_dom_object,this;
+```javascript
+class MyItemList {
+
+    constructor(container, shared) {
+
+        this.container = container;
+
+        this.data = shared.data ? shared.data : {
+            list: []
+        }
+
+    }
+
+    async Init() {
+        this.Template();
+    }
+
+    async Template() {
+        /*
+        *This is the only place where OrientedJS is getting involved
+        */
+        await Orn(this.container, this);
+    }
+
+    AddItem() {
+        this.data.list.push({});
+        this.Template();
+    }
+
+    RemoveItem(i) {
+        this.data.list.splice(i, 1);
+        this.Template();
+    }
+
+}
+
+//Lets Trigger the UI by creating object of MyItemList
+const myobject = new MyItemList('#my-container', {
+    data: {
+        list: [{
+            value: 'Pre Filled Item 1'
+        }, {
+            value: 'Pre Filled Item 2'
+        }]
+    }
+});
+
+myobject.Init();
+
+```
 
 For more template and JS Class examples please visit https://orientedjs.com/
 
