@@ -5,7 +5,9 @@ https://orientedjs.com/
 OrientedJS is an object oriented approach to achive data driven dynamic HTML with the power of ECMAScript.
 A radical approach to plan HTML based UI...
 
-- Put HTML template in a seprate *.html file and encapsulate all UI logics/data/event handlers inside an ECMAScript class in a standard *.js javascript file.
+- Put HTML template in a seprate *.html file and encapsulate all UI logics/data/event handlers inside an ECMAScript class in a standard *.js javascript file. 
+Orn(container,scope,template) method will load html template over HTTP and render UI in 'container' with 'scope'.
+'container' could be any valid selector string or a DOM object. 'scope' can be any javascript object or 'this' of any javascript class.
 
 - Serve UI resources over HTTP via any webserver (Node.js, Apache or nginx).
 
