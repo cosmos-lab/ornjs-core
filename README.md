@@ -15,7 +15,7 @@ ________________________________________________________________________________
 
 Benefit of OrientedJS
 
-UI can be served from any server (Apache, Nodejs).
+<li>UI can be served from any server (Apache, Nodejs).</li>
 
 Super easy to maintain with cleaner code.
 
