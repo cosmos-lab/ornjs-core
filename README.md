@@ -1,4 +1,4 @@
-# OrientedJS
+## OrientedJS
 
 https://orientedjs.com/
 
@@ -94,7 +94,7 @@ For more template and JS Class examples please visit https://orientedjs.com/
 
 _______________________________________________________________________________________
 
-Benefit of OrientedJS
+## Benefit of OrientedJS
 
 - Gives you more control over your UI architecture.
 
