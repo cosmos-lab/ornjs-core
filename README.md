@@ -16,13 +16,13 @@ A radical approach to plan HTML based UI...
 <div id="my-container" orn-module="my-item-list">
     <div>
         <div orn-repeat="data.list as i:item">
-            <div class="skl-d-flex skl-mt-3">
+            <div>
                 <!-- 
                     make any html tag's attribute data driven by adding prefix 'orn-'
                     orn-value="item.value" will be render as value="Pre Filled Item 1" where i=0 and item={value: 'Pre Filled Item 1'}
                 -->
-                <input type="text" orn-value="item.value" orn-model="item.value" orn-placeholder="`Enter List Item ${i+1}`" class="input skl-p-3 skl-pt-2 skl-pb-2" />
-                <a orn-onclick="RemoveItem(i)" class="float-right skl-p-3 skl-pt-2 skl-pb-2 text-large">&#10006;</a>
+                <input type="text" orn-value="item.value" orn-model="item.value" orn-placeholder="`Enter List Item ${i+1}`"/>
+                <a orn-onclick="RemoveItem(i)">&#10006;</a>
             </div>
 
         </div>
@@ -32,8 +32,8 @@ A radical approach to plan HTML based UI...
         in this way any event type handler could be attached by 'orn-' prefix before any event attribute
         e.g. onmouseover="" to orn-onmouseover="" 
     -->
-    <a class="button bg-button skl-p-3 skl-pt-2 skl-pb-2 skl-d-inline-block skl-mt-3" orn-onclick="AddItem()">
-       Add Item<span></span>
+    <a orn-onclick="AddItem()">
+       Add Item
     </a>
 </div>
 ```
