@@ -90,9 +90,7 @@ myobject.Init();
 
 ```
 
-For more template and JS Class examples please visit https://orientedjs.com/
-
-_______________________________________________________________________________________
+For more templates and JS Class examples please visit https://orientedjs.com/
 
 ## Benefit of OrientedJS
 
