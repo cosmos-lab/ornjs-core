@@ -5,7 +5,7 @@ https://orientedjs.com/
 OrientedJS is an object oriented approach to achive data driven dynamic HTML with the power of ECMAScript.
 A radical approach to plan HTML based UI...
 
-- Especially designed for rapid PWA development.
+- Specially designed for rapid PWA development.
 
 - Put HTML template in a seprate *.html file and encapsulate all UI logics/data/event handlers inside an ECMAScript class in a standard *.js javascript file. 
 Orn(container,scope,template) method will load html template over HTTP and render UI in 'container' with 'scope'.
