@@ -75,7 +75,7 @@ const Orn = async(selector, scope, template) => {
     }
 
     if (container.get().tagName.toLowerCase() == 'orn-module') {
-        template = new OrnTemplate(container.html());
+        template = new OrnTemplate(container.get());
     } else if (typeof template != 'undefined') {
         template = new OrnTemplate(template);
     } else {
@@ -389,7 +389,7 @@ class OrnTemplate {
                 value: attr.value
             });
 
-            if (attr.name == 'orn-module' && !module && dom.tag != 'orn-component') {
+            if (attr.name == 'orn-module' && !module) {
                 var template = attr.value;
                 if (!OrnTemplate.cache[template]) {
                     OrnTemplate.cache[template] = this.Parse(el, true);
@@ -400,9 +400,12 @@ class OrnTemplate {
 
         }
 
-        if (dom.tag == 'orn-module') {
-            dom.html = el.innerHTML;
-            return dom;
+        if (dom.tag == 'orn-module' && !module) {
+            let identifier = el.getAttribute('identifier');
+            if (!OrnTemplate.cache[identifier]) {
+                OrnTemplate.cache[identifier] = this.Parse(el, true);
+            }
+            return OrnTemplate.cache[identifier];
         }
 
         dom.children = [];
@@ -1100,9 +1103,8 @@ class OrnParser {
 
                 if (typeof a.value == 'object' || a.name == 'identifier') {
                     new Function(['value'], `this.${a.name} = value`).call(el, a.value);
-                } else {
-                    el.setAttribute(a.name, a.value);
                 }
+                el.setAttribute(a.name, a.value);
             }
 
 
