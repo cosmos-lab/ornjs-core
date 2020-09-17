@@ -74,9 +74,7 @@ const Orn = async(selector, scope, template) => {
         return;
     }
 
-    if (container.get().tagName.toLowerCase() == 'orn-module') {
-        template = new OrnTemplate(container.get());
-    } else if (typeof template != 'undefined') {
+    if (typeof template != 'undefined') {
         template = new OrnTemplate(template);
     } else {
         template = new OrnTemplate(container.get());
@@ -133,6 +131,10 @@ const Orn = async(selector, scope, template) => {
 
         let element = new OrnCollection(list[i]);
 
+        if (typeof element.get().component != 'undefined') {
+            continue;
+        }
+
         var component = new Function([], `return ${element.get().identifier}`)();
 
         var object = new component(element.get(), element.get().shared);
@@ -142,6 +144,7 @@ const Orn = async(selector, scope, template) => {
         if (typeof object.Init != 'undefined') {
             await object.Init();
         }
+
 
     }
 
