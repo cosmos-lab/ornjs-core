@@ -43,6 +43,24 @@ const Orns = (selector, scope, template) => {
 
     });
 
+    var list = container.find('orn-module');
+
+    for (var i = 0; i < list.length; i++) {
+
+        let element = new OrnCollection(list[i]);
+
+        var component = new Function([], `return ${element.get().identifier}`)();
+
+        var object = new component(element.get(), element.get().shared);
+
+        element.get().component = object;
+
+        if (typeof object.Init != 'undefined') {
+            object.Init();
+        }
+
+    }
+
     return container;
 
 }
@@ -72,7 +90,9 @@ const Orn = async(selector, scope, template) => {
 
         let shared = scope instanceof Array ? scope : [scope];
 
-        OrnParser.Output(OrnParser.Process(OrnParser.Clone(dom), false, 0, shared), container.get());
+        var output = OrnParser.Process(OrnParser.Clone(dom), false, 0, shared);
+
+        OrnParser.Output(output, container.get());
 
     });
 
@@ -102,6 +122,29 @@ const Orn = async(selector, scope, template) => {
         }
 
         element._Loaded = true;
+
+    }
+
+    var list = container.find('orn-module');
+
+    for (var i = 0; i < list.length; i++) {
+
+        let element = new OrnCollection(list[i]);
+
+        if (typeof element.get().component != 'undefined') {
+            continue;
+        }
+
+        var component = new Function([], `return ${element.get().identifier}`)();
+
+        var object = new component(element.get(), element.get().shared);
+
+        element.get().component = object;
+
+        if (typeof object.Init != 'undefined') {
+            await object.Init();
+        }
+
 
     }
 
@@ -322,7 +365,7 @@ class OrnTemplate {
             attributes: []
         };
 
-        if (dom.tag === '#comment') {
+        if (dom.tag == '#comment') {
             return;
         }
 
@@ -349,7 +392,7 @@ class OrnTemplate {
                 value: attr.value
             });
 
-            if (attr.name === 'orn-module' && !module) {
+            if (attr.name == 'orn-module' && !module) {
                 var template = attr.value;
                 if (!OrnTemplate.cache[template]) {
                     OrnTemplate.cache[template] = this.Parse(el, true);
@@ -357,6 +400,15 @@ class OrnTemplate {
                     return OrnTemplate.cache[template];
                 }
             }
+
+        }
+
+        if (dom.tag == 'orn-module' && !module) {
+            let identifier = el.getAttribute('identifier');
+            if (!OrnTemplate.cache[identifier]) {
+                OrnTemplate.cache[identifier] = this.Parse(el, true);
+            }
+            return OrnTemplate.cache[identifier];
         }
 
         dom.children = [];
@@ -956,6 +1008,18 @@ class OrnParser {
 
         var el = document.createElement(json.tag);
 
+        if (json.html) {
+
+            var html = json.html;
+
+            if (typeof json.html == 'function') {
+                html = json.html(el);
+            }
+
+            el.innerHTML = html;
+
+        }
+
         for (var i = 0; i < json.attributes.length; i++) {
 
             var a = json.attributes[i];
@@ -1042,9 +1106,8 @@ class OrnParser {
 
                 if (typeof a.value == 'object' || a.name == 'identifier') {
                     new Function(['value'], `this.${a.name} = value`).call(el, a.value);
-                } else {
-                    el.setAttribute(a.name, a.value);
                 }
+                el.setAttribute(a.name, a.value);
             }
 
 
