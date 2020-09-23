@@ -39,7 +39,7 @@ const Orns = (selector, scope, template) => {
 
         let shared = scope instanceof Array ? scope : [scope];
 
-        OrnParser.Output(OrnParser.Process(OrnParser.Clone(dom), false, 0, shared), container.get());
+        OrnParser.Output(OrnParser.Process(OrnParser.Clone(dom), false, 0, shared), container.get(), (typeof scope.svg != 'undefined'));
 
     });
 
@@ -92,7 +92,7 @@ const Orn = async(selector, scope, template) => {
 
         var output = OrnParser.Process(OrnParser.Clone(dom), false, 0, shared);
 
-        OrnParser.Output(output, container.get());
+        OrnParser.Output(output, container.get(), (typeof scope.svg != 'undefined'));
 
     });
 
@@ -982,7 +982,7 @@ class OrnParser {
         return node;
     }
 
-    static Output(json, parent) {
+    static Output(json, parent, svg) {
 
         if (!json || !json.tag) {
             return;
@@ -1006,7 +1006,11 @@ class OrnParser {
 
         }
 
-        var el = document.createElement(json.tag);
+        if (!svg) {
+            var el = document.createElement(json.tag);
+        } else {
+            var el = document.createElementNS('http://www.w3.org/2000/svg', json.tag);
+        }
 
         if (json.html) {
 
@@ -1119,7 +1123,7 @@ class OrnParser {
 
                 el.isOption = json.tag == 'option';
 
-                OrnParser.Output(json.children[c], el);
+                OrnParser.Output(json.children[c], el, svg);
             }
 
         }
@@ -1674,10 +1678,78 @@ Fetch.FD = (data, parentKey, fd) => {
 
     }, 50);
 
-})();
 
-/*
- * Orn.js beta v2.0.0 Sep 4 2020 * 
- * First draft of beta version on July 27, 2020. Please report any bug at github.com/cosmos-lab
- * Constant contributors github.com/cosmos-lab & github.com/fraggys
- */
+    try {
+        document.createEvent("TouchEvent");
+        Orn.touch = {};
+    } catch (e) {
+        Orn.touch = false;
+    }
+
+    Selector('body').delegate('.orn-touch-listener', 'touchstart', function(e) {
+
+        Orn.touch.moved = 0;
+
+        Orn.touch.starter = [];
+
+        Orn.touch.started = [];
+
+        for (var i = 0; i < e.touches.length; i++) {
+
+            var touch = e.touches[i];
+
+            Orn.touch.starter.push({
+                el: document.elementFromPoint(touch.clientX, touch.clientY)
+            });
+
+            Orn.touch.started.push({
+                x: touch.clientX,
+                y: touch.clientY
+            });
+
+        }
+
+    });
+
+    Selector('body').delegate('.orn-touch-listener', 'touchmove', function(e) {
+
+        var current = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+
+        current.dispatchEvent(new CustomEvent("touchover", {
+            detail: {
+                target: current
+            }
+        }));
+
+    });
+
+    Selector('body').delegate('.orn-touch-listener', 'touchend', function(e) {
+
+        var current = this;
+
+        var deltaX = e.changedTouches[0].clientX - Orn.touch.started[0].x;
+
+        var deltaY = e.changedTouches[0].clientY - Orn.touch.started[0].y;
+
+        if (deltaX > 0) {
+
+            current.dispatchEvent(new CustomEvent("touchmoveright", {
+                detail: {
+                    target: current
+                }
+            }));
+
+        }
+
+        if (deltaX < 0) {
+            current.dispatchEvent(new CustomEvent("touchmoveleft", {
+                detail: {
+                    target: current
+                }
+            }));
+        }
+
+
+    });
+
+})();
