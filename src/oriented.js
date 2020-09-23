@@ -145,7 +145,6 @@ const Orn = async(selector, scope, template) => {
             await object.Init();
         }
 
-
     }
 
     list = container.find('orn-template');
@@ -170,6 +169,7 @@ const Orn = async(selector, scope, template) => {
         await Orn(element, [scope, local], src);
 
         element._Loaded = true;
+
     }
 
     return container;
@@ -1748,7 +1748,6 @@ Fetch.FD = (data, parentKey, fd) => {
                 }
             }));
         }
-
 
     });
 
