@@ -43,11 +43,15 @@ const Orns = (selector, scope, template) => {
 
     });
 
-    var list = container.find('orn-module');
+    var list = container.find('orn-component');
 
     for (var i = 0; i < list.length; i++) {
 
         let element = new OrnCollection(list[i]);
+
+        if (typeof element._Loaded != 'undefined') {
+            continue;
+        }
 
         var component = new Function([], `return ${element.get().identifier}`)();
 
@@ -58,6 +62,8 @@ const Orns = (selector, scope, template) => {
         if (typeof object.Init != 'undefined') {
             object.Init();
         }
+
+        element._Loaded = true;
 
     }
 
@@ -122,28 +128,6 @@ const Orn = async(selector, scope, template) => {
         }
 
         element._Loaded = true;
-
-    }
-
-    var list = container.find('orn-module');
-
-    for (var i = 0; i < list.length; i++) {
-
-        let element = new OrnCollection(list[i]);
-
-        if (typeof element.get().component != 'undefined') {
-            continue;
-        }
-
-        var component = new Function([], `return ${element.get().identifier}`)();
-
-        var object = new component(element.get(), element.get().shared);
-
-        element.get().component = object;
-
-        if (typeof object.Init != 'undefined') {
-            await object.Init();
-        }
 
     }
 
@@ -325,6 +309,7 @@ class OrnTemplate {
     }
 
     ProcesS() {
+
         var vdom = false;
 
         if (this.IsElement()) {
@@ -334,6 +319,7 @@ class OrnTemplate {
         }
 
         return vdom;
+
     }
 
     IsURL() {
@@ -403,12 +389,16 @@ class OrnTemplate {
 
         }
 
-        if (dom.tag == 'orn-module' && !module) {
+        if (dom.tag == 'orn-component' && !module) {
+
             let identifier = el.getAttribute('identifier');
+
             if (!OrnTemplate.cache[identifier]) {
                 OrnTemplate.cache[identifier] = this.Parse(el, true);
             }
+
             return OrnTemplate.cache[identifier];
+
         }
 
         dom.children = [];
@@ -417,9 +407,26 @@ class OrnTemplate {
 
             var ch = el.childNodes[c];
 
-            var t = this.Parse(ch);
+            if (ch.nodeName.toLowerCase() == 'orn-component') {
 
-            dom.children.push(t);
+                let identifier = ch.getAttribute('identifier');
+
+                if (!OrnTemplate.cache[identifier]) {
+                    OrnTemplate.cache[identifier] = this.Parse(ch);
+                }
+
+                var child = {
+                    tag: OrnTemplate.cache[identifier].tag,
+                    attributes: OrnTemplate.cache[identifier].attributes
+                }
+
+            } else {
+
+                var child = this.Parse(ch);
+
+            }
+
+            dom.children.push(child);
 
         }
 

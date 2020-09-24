@@ -1,0 +1,91 @@
+<script src="src/oriented.js"></script>
+
+<head>
+
+</head>
+
+<body>
+
+    <div id="my-app">
+
+        <orn-component identifier="AnyModule" orn-shared="{
+            shared_data:data
+        }">
+            <div>
+                <div orn-repeat="record.list as t:item">
+                    {{item.name}}
+                </div>
+            </div>
+        </orn-component>
+
+        <div id="orn-module-tag-in-orn-module-example" orn-module="parent-my-module">
+
+            <orn-component identifier="AnyModule" orn-shared="{
+                shared_data:data
+            }">
+                <div>
+                    <div orn-repeat="record.list as t:item">
+                        {{item.name}}
+                    </div>
+                </div>
+            </orn-component>
+
+        </div>
+
+    </div>
+
+    <script>
+        Orn.debug = 1;
+        var data = {
+            label: 'My Module',
+            list: [{
+                name: 'Respected Kalam Sir'
+            }, {
+                name: 'Respected Mahatma Gandhi'
+            }, {
+                name: 'Respected Martin Luther King'
+            }]
+        };
+
+        class AnyModule {
+
+            constructor(container, shared) {
+
+                /**
+                 * Store container in 'this'. Container is passed in new AnyModule(container,scope) via 'Orn'
+                 */
+
+                this.container = container;
+
+                this.record = shared.shared_data;
+            }
+
+            Init() {
+
+                /**
+                 * 
+                 * Ignite module UI by inline template or external template
+                 * This this example  we used Orns 'synchronized' call of Orn. Please use Orn(container,scope,template) if external template.
+                 * */
+
+                Orns(this.container, this)
+            }
+
+
+        }
+
+        window.onload = () => {
+
+            Orns('#my-app', {
+                data: data
+            });
+
+
+            Orns('#orn-module-tag-in-orn-module-example', {
+                data: data
+            });
+
+        }
+    </script>
+
+</body>
