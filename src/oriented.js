@@ -79,10 +79,14 @@ const Orn = async(selector, scope, template) => {
 
     const container = new OrnCollection(selector);
 
-    if (!container.get()) {
+    const el = container.get();
+
+    if (!el) {
         Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
         return;
     }
+
+    el.scope = new Proxy(scope, OrnProxy);
 
     if (typeof template != 'undefined') {
         template = new OrnTemplate(template);
