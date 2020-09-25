@@ -231,6 +231,7 @@ const OrnProxy = {
 /**
  * Lazy Load a javascript or css
  * @param  {String} resouce resouce path or array of resouce path
+ * 
  */
 
 Orn.Include = async(resource) => {
