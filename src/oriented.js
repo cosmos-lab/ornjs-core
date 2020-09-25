@@ -1164,9 +1164,7 @@ class OrnParser {
             var a = json.attributes[i];
 
             if (typeof a.value == 'undefined') {
-
                 continue;
-
             }
 
             if ((a.name[0] + a.name[1]) === 'on') {
@@ -1248,7 +1246,6 @@ class OrnParser {
                 }
                 el.setAttribute(a.name, a.value);
             }
-
 
         }
 
