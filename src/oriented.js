@@ -20,6 +20,8 @@ const Orns = (selector, scope, template) => {
 
     const el = container.get();
 
+    const svg = container.attr('svg');
+
     if (!el) {
         Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
         return;
@@ -43,7 +45,7 @@ const Orns = (selector, scope, template) => {
 
         let shared = scope instanceof Array ? scope : [scope];
 
-        OrnParser.Output(OrnParser.Process(OrnParser.Clone(dom), false, 0, shared), container.get(), (typeof scope.svg != 'undefined'));
+        OrnParser.Output(OrnParser.Process(OrnParser.Clone(dom), false, 0, shared), container.get(), svg);
 
     });
 
@@ -81,6 +83,8 @@ const Orn = async(selector, scope, template) => {
 
     const el = container.get();
 
+    const svg = container.attr('svg');
+
     if (!el) {
         Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
         return;
@@ -106,7 +110,7 @@ const Orn = async(selector, scope, template) => {
 
         var output = OrnParser.Process(OrnParser.Clone(dom), false, 0, shared);
 
-        OrnParser.Output(output, container.get(), (typeof scope.svg != 'undefined'));
+        OrnParser.Output(output, container.get(), svg);
 
     });
 
@@ -207,7 +211,7 @@ const OrnProxy = {
 
         target[key] = value;
 
-        var els = Selector('input, textarea');
+        var els = Selector('input, textarea, select');
 
         els.each((el) => {
             if (typeof el.__listen !== 'undefined' && target == el.__listen.target && key == el.__listen.key) {
@@ -219,10 +223,8 @@ const OrnProxy = {
 
         for (var i = 0; i < els.length; i++) {
             var el = els[i];
-            if (typeof el.__listen !== 'undefined' && key == el.__listen.key) {
-                if (el.__listen.target.indexOf(target) != -1) {
-                    el.textContent = value;
-                }
+            if (typeof el.__listen !== 'undefined' && el.__listen.keys.indexOf(key) != -1) {
+                el.__listen.target();
             }
         }
 
@@ -966,47 +968,44 @@ class OrnParser {
 
                 parser = new OrnParser(node, parent, index, false, scope);
 
-                const param = parser.Args();
+                var matches = [];
 
-                var targets = [];
-
-                var key = '';
+                var keys = [];
 
                 for (var i = 0; i < match.length; i++) {
 
                     let ex = match[i].replace(/\{\{|\}\}/gi, '');
 
+                    matches.push(ex);
+
                     let __v = parser.Parse(ex);
 
                     node.text = node.text.replace(match[i], __v);
 
-                    //Listener
-
                     let parts = ex.split('.');
 
-                    let obj = parts.slice(0, parts.length - 1).join('.');
-
-                    key = parts[parts.length - 1];
-
-                    if (obj.length) {
-
-                        let v = parser.Parse(`${obj}`);
-                        targets.push(v);
-
-                    } else {
-                        targets.push(scope[0]);
-                    }
+                    keys.push(parts[parts.length - 1]);
 
                 }
 
-                node.__listen = ((targets) => {
+                node.__listen = ((parser, exps) => {
                     return (el) => {
                         el.__listen = {
-                            key: key,
-                            target: targets
+                            keys: keys,
+                            target: () => {
+
+                                var text = '';
+
+                                for (var i = 0; i < exps.length; i++) {
+                                    text += ' ' + parser.Parse(exps[i]);
+                                }
+
+                                el.textContent = text;
+
+                            }
                         };
                     }
-                })(targets);
+                })(parser, matches);
 
             }
 
