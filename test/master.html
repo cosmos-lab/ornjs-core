@@ -41,14 +41,14 @@
 
         <h3>{{data.label}}</h3>
         <input type="text" orn-model="data.label" orn-value="data.label" />
-        <select orn-model="data.label">
+        <select orn-model="data.label" orn-value="data.label">
             <option orn-repeat="data.list as t:item" orn-value="item.name">{{item.name}}</option>
         </select>
 
         <div class="h-sep">
             <h3>Plain</h3>
             <div orn-repeat="data.list as t:item">
-                <b>{{item.name}}</b> <b>{{item.id}}</b>
+                {{item.name}} {{item.id}}
                 <input type="text" orn-model="item.id" orn-value="item.id" />
                 <textarea type="text" orn-model="item.name" orn-value="data.list[t].name"></textarea>
             </div>
