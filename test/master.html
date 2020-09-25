@@ -1,0 +1,155 @@
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=no">
+    <script src="../src/oriented.js"></script>
+    <style>
+        input,
+        textarea,
+        select {
+            display: block;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ddd;
+            background: none;
+        }
+        
+        .h-sep {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid;
+        }
+        
+        h3 {
+            padding: 0px;
+            margin: 0px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <div id="my-app">
+
+        <h1>{{label}}</h1>
+        <input type="text" orn-model="label" orn-value="label" />
+
+        <h3>{{data.label}}</h3>
+        <input type="text" orn-model="data.label" orn-value="data.label" />
+        <select orn-model="data.label">
+            <option orn-repeat="data.list as t:item" orn-value="item.name">{{item.name}}</option>
+        </select>
+
+        <div class="h-sep">
+            <h3>Plain</h3>
+            <div orn-repeat="data.list as t:item">
+                <b>{{item.name}}</b> <b>{{item.id}}</b>
+                <input type="text" orn-model="item.id" orn-value="item.id" />
+                <textarea type="text" orn-model="item.name" orn-value="data.list[t].name"></textarea>
+            </div>
+        </div>
+
+        <div class="h-sep">
+            <h3>'AnyModule' Component Inline Template</h3>
+            <input type="text" orn-model="data.label" orn-value="data.label" />
+            <orn-component identifier="AnyModule" orn-shared="{
+            shared_data:data
+        }">
+                <input type="text" orn-model="data.label" orn-value="data.label" />
+                <div>
+                    <div orn-repeat="record.list as t:item">
+                        <b>{{item.name}}</b> {{t+1}}
+                        <input type="text" orn-model="item.name" orn-value="item.name" />
+                    </div>
+                </div>
+            </orn-component>
+
+        </div>
+
+        <div class="h-sep" id="orn-module-tag-in-orn-module-example" orn-module="parent-my-module">
+            <h3>'AnyModule' Component Reuse</h3>
+            <orn-component identifier="AnyModule" orn-shared="{
+                shared_data:data
+            }">
+
+            </orn-component>
+
+        </div>
+
+    </div>
+
+    <script>
+        var el = Selector('#my-app').get()
+        Orn.debug = 1;
+        var data = {
+            label: 'My Module',
+            inner: 'My Inner Label',
+            list: [{
+                name: 'Item x',
+                id: '987987IUOIU'
+            }, {
+                name: 'Item y'
+            }, {
+                name: 'Item z'
+            }]
+        };
+
+        class AnyModule {
+
+            constructor(container, shared) {
+
+                this.data = {
+                    label: shared.shared_data.inner,
+                    list: [{
+                        name: 'Inner Item a'
+                    }, {
+                        name: 'Inner Item b'
+                    }, {
+                        name: 'Inner Item c'
+                    }]
+                }
+
+                /**
+                 * Store container in 'this'. Container is passed in new AnyModule(container,scope) via 'Orn'
+                 */
+
+                this.container = container;
+
+                this.record = shared.shared_data;
+            }
+
+            Init() {
+
+                /**
+                 * 
+                 * Ignite module UI by inline template or external template
+                 * This this example  we used Orns 'synchronized' call of Orn. Please use Orn(container,scope,template) if external template.
+                 * */
+
+                Orns(this.container, this)
+            }
+
+
+        }
+
+        window.onload = () => {
+
+            Orns('#my-app', {
+                label: 'My App',
+                data: data
+            });
+
+
+            Orns('#orn-module-tag-in-orn-module-example', {
+                data: data
+            });
+
+        }
+    </script>
+
+</body>

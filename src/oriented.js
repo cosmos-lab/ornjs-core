@@ -18,10 +18,14 @@ const Orns = (selector, scope, template) => {
 
     const container = new OrnCollection(selector);
 
-    if (!container.get()) {
-        Orn.debug && console.log(`DYM-ERROR: Container not found for selector "${selector}"`, scope, selector);
+    const el = container.get();
+
+    if (!el) {
+        Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
         return;
     }
+
+    el.scope = new Proxy(scope, OrnProxy);
 
     if (typeof template != 'undefined') {
         template = new OrnTemplate(template);
@@ -75,10 +79,14 @@ const Orn = async(selector, scope, template) => {
 
     const container = new OrnCollection(selector);
 
-    if (!container.get()) {
-        Orn.debug && console.log(`DYM-ERROR: Container not found for selector "${selector}"`, scope, selector);
+    const el = container.get();
+
+    if (!el) {
+        Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
         return;
     }
+
+    el.scope = new Proxy(scope, OrnProxy);
 
     if (typeof template != 'undefined') {
         template = new OrnTemplate(template);
@@ -140,7 +148,7 @@ const Orn = async(selector, scope, template) => {
         let src = element.getAttribute('src');
 
         if (!src) {
-            Orn.debug && console.log(`DYM-ERROR: Template src not found:`, element);
+            Orn.debug && console.log(`ORN: Template src not found:`, element);
             continue;
         }
 
@@ -160,9 +168,74 @@ const Orn = async(selector, scope, template) => {
 
 }
 
+const OrnProxy = {
+
+    get(target, key) {
+
+        if (key == 'isProxy')
+            return true;
+
+        if (target[key] instanceof Array) {
+
+            var arr = [];
+
+            target[key].forEach((e) => {
+                var proxy = new Proxy(e, OrnProxy);
+                arr.push(proxy);
+            })
+
+            target[key] = arr;
+
+            return target[key];
+
+
+        } else if (typeof target[key] === 'object' && !target[key].isProxy && target[key] !== null) {
+
+            var proxy = new Proxy(target[key], OrnProxy);
+
+            return proxy;
+
+        } else {
+
+            return target[key];
+
+        }
+
+    },
+
+    set(target, key, value) {
+
+        target[key] = value;
+
+        var els = Selector('input, textarea');
+
+        els.each((el) => {
+            if (typeof el.__listen !== 'undefined' && target == el.__listen.target && key == el.__listen.key) {
+                el.value = value;
+            }
+        });
+
+        var els = OrnTemplate.TextNodes(document.body);
+
+        for (var i = 0; i < els.length; i++) {
+            var el = els[i];
+            if (typeof el.__listen !== 'undefined' && key == el.__listen.key) {
+                if (el.__listen.target.indexOf(target) != -1) {
+                    el.textContent = value;
+                }
+            }
+        }
+
+        return true;
+
+    }
+
+}
+
 /**
  * Lazy Load a javascript or css
  * @param  {String} resouce resouce path or array of resouce path
+ * 
  */
 
 Orn.Include = async(resource) => {
@@ -432,6 +505,15 @@ class OrnTemplate {
 
         return dom;
 
+    }
+
+    static TextNodes(node) {
+        var all = [];
+        for (node = node.firstChild; node; node = node.nextSibling) {
+            if (node.nodeType == 3) all.push(node);
+            else all = all.concat(OrnTemplate.TextNodes(node));
+        }
+        return all;
     }
 
 }
@@ -866,7 +948,7 @@ class OrnParser {
         }
 
         if (!node || !node.tag) {
-            Orn.debug && console.log('DYM-ERROR: Invalid HTML tag', arguments);
+            Orn.debug && console.log('ORN: Invalid HTML tag', arguments);
             return;
         }
 
@@ -884,14 +966,52 @@ class OrnParser {
 
                 parser = new OrnParser(node, parent, index, false, scope);
 
+                const param = parser.Args();
+
+                var targets = [];
+
+                var key = '';
+
                 for (var i = 0; i < match.length; i++) {
-                    let __v = parser.Parse(match[i].replace(/\{\{|\}\}/gi, ''));
+
+                    let ex = match[i].replace(/\{\{|\}\}/gi, '');
+
+                    let __v = parser.Parse(ex);
+
                     node.text = node.text.replace(match[i], __v);
+
+                    //Listener
+
+                    let parts = ex.split('.');
+
+                    let obj = parts.slice(0, parts.length - 1).join('.');
+
+                    key = parts[parts.length - 1];
+
+                    if (obj.length) {
+
+                        let v = parser.Parse(`${obj}`);
+                        targets.push(v);
+
+                    } else {
+                        targets.push(scope[0]);
+                    }
+
                 }
+
+                node.__listen = ((targets) => {
+                    return (el) => {
+                        el.__listen = {
+                            key: key,
+                            target: targets
+                        };
+                    }
+                })(targets);
 
             }
 
             return node;
+
         }
 
         var skip = false;
@@ -1006,7 +1126,11 @@ class OrnParser {
             if (parent.isOption) {
                 parent.text = text;
             } else {
-                parent.appendChild(document.createTextNode(text));
+                var el = document.createTextNode(text);
+                parent.appendChild(el);
+                if (typeof json.__listen != 'undefined') {
+                    json.__listen(el);
+                }
             }
 
             return;
@@ -1029,6 +1153,10 @@ class OrnParser {
 
             el.innerHTML = html;
 
+        }
+
+        if (typeof json.__listen != 'undefined') {
+            json.__listen(el);
         }
 
         for (var i = 0; i < json.attributes.length; i++) {
@@ -1158,7 +1286,7 @@ class OrnParser {
             r = new Function(param.arg, 'return ' + ex).apply(this.scope[0], param.val);
         } catch (e) {
             r = null;
-            Orn.debug && console.log(`DYM-ERROR: Expression "${ex}" not found in scope`, this.scope);
+            Orn.debug && console.log(`ORN: Expression "${ex}" not found in scope`, this.scope);
         }
 
         return r;
@@ -1280,7 +1408,7 @@ class OrnParser {
                     `);
 
             } catch (e) {
-                Orn.debug && console.log(`DYM-ERROR: orn-on expression "${exp}" not found in provided scope:`, this.scope);
+                Orn.debug && console.log(`ORN: orn-on expression "${exp}" not found in provided scope:`, this.scope);
                 return;
             }
         } else {
@@ -1337,11 +1465,11 @@ class OrnParser {
 
         this.node.attributes[this.attribute.index] = {
             name: 'model',
-            value: (function(scope, model) {
+            value: ((scope, model) => {
 
                 var value = scope.Parse(model);
 
-                return function(o) {
+                return (o) => {
 
                     switch (true) {
 
@@ -1392,12 +1520,19 @@ class OrnParser {
 
                     }
 
-                    let parser = new OrnParser(false, false, false, false, [...scope.scope, {
-                        _inputvalue: value
-                    }]);
+                    var parts = model.split('.');
 
-                    parser.Parse(`${model}=_inputvalue`);
+                    var obj = parts.slice(0, parts.length - 1).join('.');
 
+                    var key = parts[parts.length - 1]
+
+                    var obj = obj.length ? this.Parse(`${obj}`) : this.scope[0];
+
+                    var proxy = new Proxy(obj, OrnProxy);
+
+                    proxy[key] = value;
+
+                    return model;
 
                 };
 
@@ -1496,15 +1631,50 @@ class OrnParser {
 
     Attribute() {
 
-        if (this.node.tag === 'TEXTAREA' && this.attribute.name === 'orn-value') {
-            this.node.html = this.Parse(this.attribute.value);
-        } else {
-            let val = this.Parse(this.attribute.value);
-            this.node.attributes[this.attribute.index] = {
-                name: this.attribute.name.replace('orn-', ''),
-                value: val ? val : ''
-            };
+        if (this.attribute.name === 'orn-value') {
+
+            if (this.node.tag === 'TEXTAREA') {
+                this.node.html = this.Parse(this.attribute.value);
+            } else {
+                let val = this.Parse(this.attribute.value);
+                this.node.attributes[this.attribute.index] = {
+                    name: this.attribute.name.replace('orn-', ''),
+                    value: val ? val : ''
+                };
+            }
+
+            var parts = this.attribute.value.split('.');
+            var ex = parts.slice(0, parts.length - 1).join('.');
+
+            const param = this.Args();
+
+            try {
+                ex = new Function(param.arg, 'return ' + ex).apply(this.scope[0], param.val);
+            } catch (e) {
+                Orn.debug && console.log(`ORN: Expression "${ex}" not found in scope`, this.scope, e);
+            }
+
+            if (!ex) {
+                ex = this.scope[0];
+            }
+
+            this.node.__listen = ((proxy) => {
+                return (el) => {
+                    el.__listen = {
+                        key: parts[parts.length - 1],
+                        target: proxy
+                    };
+                }
+            })(ex);
+
+            return;
         }
+
+        let val = this.Parse(this.attribute.value);
+        this.node.attributes[this.attribute.index] = {
+            name: this.attribute.name.replace('orn-', ''),
+            value: val ? val : ''
+        };
 
     }
 
