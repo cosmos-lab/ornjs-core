@@ -20,8 +20,6 @@ const Orns = (selector, scope, template) => {
 
     const el = container.get();
 
-    const svg = container.attr('svg');
-
     if (!el) {
         Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
         return;
@@ -45,7 +43,7 @@ const Orns = (selector, scope, template) => {
 
         let shared = scope instanceof Array ? scope : [scope];
 
-        OrnParser.Output(OrnParser.Process(OrnParser.Clone(dom), false, 0, shared), container.get(), svg);
+        OrnParser.Output(OrnParser.Process(OrnParser.Clone(dom), false, 0, shared), container.get(), (typeof scope.svg != 'undefined'));
 
     });
 
@@ -83,8 +81,6 @@ const Orn = async(selector, scope, template) => {
 
     const el = container.get();
 
-    const svg = container.attr('svg');
-
     if (!el) {
         Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
         return;
@@ -110,7 +106,7 @@ const Orn = async(selector, scope, template) => {
 
         var output = OrnParser.Process(OrnParser.Clone(dom), false, 0, shared);
 
-        OrnParser.Output(output, container.get(), svg);
+        OrnParser.Output(output, container.get(), (typeof scope.svg != 'undefined'));
 
     });
 
