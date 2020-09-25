@@ -36,6 +36,9 @@
 
     <div id="my-app">
 
+        <h1>{{label}}</h1>
+        <input type="text" orn-model="label" orn-value="label" />
+
         <h3>{{data.label}}</h3>
         <input type="text" orn-model="data.label" orn-value="data.label" />
         <select orn-model="data.label">
@@ -137,6 +140,7 @@
         window.onload = () => {
 
             Orns('#my-app', {
+                label: 'My App',
                 data: data
             });
 

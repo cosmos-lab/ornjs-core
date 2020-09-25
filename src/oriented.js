@@ -21,7 +21,7 @@ const Orns = (selector, scope, template) => {
     const el = container.get();
 
     if (!el) {
-        Orn.debug && console.log(`DYM-ERROR: Container not found for selector "${selector}"`, scope, selector);
+        Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
         return;
     }
 
@@ -80,7 +80,7 @@ const Orn = async(selector, scope, template) => {
     const container = new OrnCollection(selector);
 
     if (!container.get()) {
-        Orn.debug && console.log(`DYM-ERROR: Container not found for selector "${selector}"`, scope, selector);
+        Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
         return;
     }
 
@@ -144,7 +144,7 @@ const Orn = async(selector, scope, template) => {
         let src = element.getAttribute('src');
 
         if (!src) {
-            Orn.debug && console.log(`DYM-ERROR: Template src not found:`, element);
+            Orn.debug && console.log(`ORN: Template src not found:`, element);
             continue;
         }
 
@@ -944,7 +944,7 @@ class OrnParser {
         }
 
         if (!node || !node.tag) {
-            Orn.debug && console.log('DYM-ERROR: Invalid HTML tag', arguments);
+            Orn.debug && console.log('ORN: Invalid HTML tag', arguments);
             return;
         }
 
@@ -966,28 +966,40 @@ class OrnParser {
 
                 var targets = [];
 
+                var key = '';
+
                 for (var i = 0; i < match.length; i++) {
 
-                    var ex = match[i].replace(/\{\{|\}\}/gi, '');
+                    let ex = match[i].replace(/\{\{|\}\}/gi, '');
 
                     let __v = parser.Parse(ex);
 
                     node.text = node.text.replace(match[i], __v);
 
-                    var parts = ex.split('.');
+                    //Listener
 
-                    try {
-                        let v = new Function(param.arg, 'return ' + parts.slice(0, parts.length - 1).join('.')).apply(scope, param.val);
+                    let parts = ex.split('.');
+
+                    let obj = parts.slice(0, parts.length - 1).join('.');
+
+                    key = parts[parts.length - 1];
+
+                    if (obj.length) {
+
+                        let v = parser.Parse(`${obj}`);
                         targets.push(v);
-                    } catch (e) {}
+
+                    } else {
+                        targets.push(scope[0]);
+                    }
 
                 }
 
-                node.__listen = ((proxy) => {
+                node.__listen = ((targets) => {
                     return (el) => {
                         el.__listen = {
-                            key: parts[parts.length - 1],
-                            target: proxy
+                            key: key,
+                            target: targets
                         };
                     }
                 })(targets);
@@ -995,6 +1007,7 @@ class OrnParser {
             }
 
             return node;
+
         }
 
         var skip = false;
@@ -1269,7 +1282,7 @@ class OrnParser {
             r = new Function(param.arg, 'return ' + ex).apply(this.scope[0], param.val);
         } catch (e) {
             r = null;
-            Orn.debug && console.log(`DYM-ERROR: Expression "${ex}" not found in scope`, this.scope);
+            Orn.debug && console.log(`ORN: Expression "${ex}" not found in scope`, this.scope);
         }
 
         return r;
@@ -1391,7 +1404,7 @@ class OrnParser {
                     `);
 
             } catch (e) {
-                Orn.debug && console.log(`DYM-ERROR: orn-on expression "${exp}" not found in provided scope:`, this.scope);
+                Orn.debug && console.log(`ORN: orn-on expression "${exp}" not found in provided scope:`, this.scope);
                 return;
             }
         } else {
@@ -1448,11 +1461,11 @@ class OrnParser {
 
         this.node.attributes[this.attribute.index] = {
             name: 'model',
-            value: (function(scope, model) {
+            value: ((scope, model) => {
 
                 var value = scope.Parse(model);
 
-                return function(o) {
+                return (o) => {
 
                     switch (true) {
 
@@ -1504,14 +1517,13 @@ class OrnParser {
                     }
 
                     var parts = model.split('.');
+
                     var obj = parts.slice(0, parts.length - 1).join('.');
+
                     var key = parts[parts.length - 1]
 
-                    let parser = new OrnParser(false, false, false, false, [...scope.scope, {
-                        _inputvalue: value
-                    }]);
+                    var obj = obj.length ? this.Parse(`${obj}`) : this.scope[0];
 
-                    var obj = parser.Parse(`${obj}`);
                     var proxy = new Proxy(obj, OrnProxy);
 
                     proxy[key] = value;
@@ -1635,8 +1647,11 @@ class OrnParser {
             try {
                 ex = new Function(param.arg, 'return ' + ex).apply(this.scope[0], param.val);
             } catch (e) {
-                ex = null;
-                Orn.debug && console.log(`DYM-ERROR: Expression "${ex}" not found in scope`, this.scope);
+                Orn.debug && console.log(`ORN: Expression "${ex}" not found in scope`, this.scope, e);
+            }
+
+            if (!ex) {
+                ex = this.scope[0];
             }
 
             this.node.__listen = ((proxy) => {
