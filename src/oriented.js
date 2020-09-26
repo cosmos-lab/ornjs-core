@@ -466,11 +466,15 @@ class OrnTemplate {
 
             let identifier = el.getAttribute('identifier');
 
-            if (!OrnTemplate.cache[identifier]) {
-                OrnTemplate.cache[identifier] = this.Parse(el, true);
-            }
+            if (identifier) {
 
-            return OrnTemplate.cache[identifier];
+                if (!OrnTemplate.cache[identifier]) {
+                    OrnTemplate.cache[identifier] = this.Parse(el, true);
+                }
+
+                return OrnTemplate.cache[identifier];
+
+            }
 
         }
 
@@ -484,13 +488,19 @@ class OrnTemplate {
 
                 let identifier = ch.getAttribute('identifier');
 
-                if (!OrnTemplate.cache[identifier]) {
-                    OrnTemplate.cache[identifier] = this.Parse(ch);
-                }
+                if (identifier) {
 
-                var child = {
-                    tag: OrnTemplate.cache[identifier].tag,
-                    attributes: OrnTemplate.cache[identifier].attributes
+                    if (!OrnTemplate.cache[identifier]) {
+                        OrnTemplate.cache[identifier] = this.Parse(ch);
+                    }
+
+                    var child = {
+                        tag: OrnTemplate.cache[identifier].tag,
+                        attributes: OrnTemplate.cache[identifier].attributes
+                    }
+
+                } else {
+                    var child = this.Parse(ch);
                 }
 
             } else {
