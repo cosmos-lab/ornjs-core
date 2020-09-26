@@ -15,6 +15,7 @@
             width: 100%;
             border: 1px solid #ddd;
             background: none;
+            font: inherit;
         }
         
         .h-sep {
@@ -45,13 +46,14 @@
             <option orn-repeat="data.list as t:item" orn-value="item.name">{{item.name}}</option>
         </select>
 
+        <h3 class="h-sep">External Template</h3>
+        <orn-template src="template-default.html"></orn-template>
+
         <div class="h-sep">
-            <h3>Plain</h3>
-            <div orn-repeat="data.list as t:item">
-                {{item.name}} {{item.id}}
-                <input type="text" orn-model="item.id" orn-value="item.id" />
-                <textarea type="text" orn-model="item.name" orn-value="data.list[t].name"></textarea>
-            </div>
+            <h3>External Component Load</h3>
+            <orn-component identifier="TestOrnClass" src="TestOrnClass.js" orn-shared="{label:'My App External Component'}">
+
+            </orn-component>
         </div>
 
         <div class="h-sep">
@@ -137,9 +139,9 @@
 
         }
 
-        window.onload = () => {
+        window.onload = async() => {
 
-            Orns('#my-app', {
+            await Orn('#my-app', {
                 label: 'My App',
                 data: data
             });

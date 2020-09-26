@@ -1,0 +1,13 @@
+<div>
+    <h3>{{label}}</h3>
+    <input type="text" orn-model="label" orn-value="label" />
+    <div orn-repeat="data.list as t:item">
+        <b>Name: {{item.name}} | ID: {{item.id}}</b>
+        <input type="text" orn-model="item.id" orn-value="item.id" placeholder="Enter ID" />
+        <textarea type="text" orn-model="item.name" orn-value="data.list[t].name"></textarea>
+        <select orn-model="item.name" orn-value="item.name">
+            <option orn-repeat="data.list as j:option" orn-value="option.name">{{option.name}}</option>
+        </select>
+    </div>
+
+</div>
