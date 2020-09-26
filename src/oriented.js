@@ -456,6 +456,8 @@ class OrnTemplate {
                 } else {
                     return OrnTemplate.cache[template];
                 }
+            } else {
+
             }
 
         }
