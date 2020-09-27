@@ -1648,9 +1648,7 @@ class OrnParser {
 
             try {
                 ex = new Function(param.arg, 'return ' + ex).apply(this.scope[0], param.val);
-            } catch (e) {
-                Orn.debug && console.log(`ORN: Expression "${ex}" not found in scope`, this.scope, e);
-            }
+            } catch (e) {}
 
             if (!ex) {
                 ex = this.scope[0];
