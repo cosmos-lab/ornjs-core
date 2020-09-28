@@ -168,6 +168,48 @@ const Orn = async(selector, scope, template) => {
 
 }
 
+const OrnVoice = {
+
+    dispose: function() {
+
+    },
+
+    Get: (element, handler) => {
+
+        Selector(element).css('orn-voice-input-active', true);
+
+        try {
+
+            var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+
+            var recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = "en-US";
+            recognition.start();
+
+            recognition.onspeechend = () => {
+                recognition.stop();
+                Selector(element).css('orn-voice-input-active', false);
+            };
+
+            recognition.onresult = (event) => {
+
+                for (var i = event.resultIndex; i < event.results.length; ++i) {
+                    var keyword = event.results[i][0].transcript.trim();
+                    if (event.results[i].isFinal) {
+                        handler(keyword);
+                    }
+                }
+            };
+
+        } catch (e) {
+
+        }
+    }
+
+}
+
 const OrnProxy = {
 
     get(target, key) {
@@ -1759,10 +1801,6 @@ class FetchWrapper {
 
     };
 
-}
-
-var HashPath = () => {
-    return location.hash.substring(1, location.hash.length).split('/');
 }
 
 var Selector = (selector) => {
