@@ -206,6 +206,7 @@ const OrnVoice = {
         } catch (e) {
 
         }
+
     }
 
 }
@@ -576,6 +577,7 @@ class OrnCollection extends Array {
 
         parent = parent ? parent : [document];
 
+
         for (let i = 0; i < parent.length; i++) {
 
             var list = [];
@@ -590,10 +592,10 @@ class OrnCollection extends Array {
 
             } else if (selector) {
 
-                selector = selector.split(',');
+                var sel = selector.split(',');
 
-                for (let s = 0; s < selector.length; s++) {
-                    list = list.concat(Array.from(parent[i].querySelectorAll(selector[s])));
+                for (let s = 0; s < sel.length; s++) {
+                    list = list.concat(Array.from(parent[i].querySelectorAll(sel[s])));
                 }
 
             }

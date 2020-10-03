@@ -59,17 +59,20 @@
         <div class="h-sep">
             <h3>'AnyModule' Component Inline Template</h3>
             <input type="text" orn-model="data.label" orn-value="data.label" />
-            <orn-component identifier="AnyModule" orn-shared="{
+            <div orn-repeat="[1,2,3] as i:ite">
+
+                <orn-component identifier="AnyModule" orn-shared="{
             shared_data:data
         }">
-                <input type="text" orn-model="data.label" orn-value="data.label" />
-                <div>
-                    <div orn-repeat="record.list as t:item">
-                        <b>{{item.name}}</b> {{t+1}}
-                        <input type="text" orn-model="item.name" orn-value="item.name" />
+                    <input type="text" orn-model="data.label" orn-value="data.label" />
+                    <div>
+                        <div orn-repeat="record.list as t:item">
+                            <b>{{item.name}}</b> {{t+1}}
+                            <input type="text" orn-model="item.name" orn-value="item.name" />
+                        </div>
                     </div>
-                </div>
-            </orn-component>
+                </orn-component>
+            </div>
 
         </div>
 
@@ -89,6 +92,7 @@
         var el = Selector('#my-app').get()
         Orn.debug = 1;
         var data = {
+            type: 'text',
             label: 'My Module',
             inner: 'My Inner Label',
             list: [{

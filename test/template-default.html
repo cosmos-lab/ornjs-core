@@ -11,3 +11,24 @@
     </div>
 
 </div>
+
+<div class="h-sep">
+    <h3>'AnyModule' Component Inline Template</h3>
+    <input type="text" orn-model="data.label" orn-value="data.label" />
+    <div orn-repeat="[1,2,3] as i:ite">
+
+        <orn-component identifier="AnyModule" orn-shared="{
+    shared_data:data,
+    OnSave:()=>{}
+}">
+            <input type="text" orn-model="data.label" orn-value="data.label" />
+            <div>
+                <div orn-repeat="record.list as t:item">
+                    <b>{{item.name}}</b> {{t+1}}
+                    <input type="text" orn-model="item.name" orn-value="item.name" />
+                </div>
+            </div>
+        </orn-component>
+    </div>
+
+</div>
