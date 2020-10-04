@@ -18,7 +18,7 @@ const Orns = (selector, scope, template) => {
 
     const container = new OrnCollection(selector);
 
-    const el = container.get();
+    const el = container.element();
 
     if (!el) {
         Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
@@ -30,20 +30,20 @@ const Orns = (selector, scope, template) => {
     if (typeof template != 'undefined') {
         template = new OrnTemplate(template);
     } else {
-        template = new OrnTemplate(container.get());
+        template = new OrnTemplate(container.element());
     }
 
     const vdom = template.ProcesS();
 
-    while (container.get().firstChild) {
-        container.get().removeChild(container.get().firstChild);
+    while (container.element().firstChild) {
+        container.element().removeChild(container.element().firstChild);
     }
 
     vdom.map((dom) => {
 
         let shared = scope instanceof Array ? scope : [scope];
 
-        OrnParser.Output(OrnParser.Process(OrnParser.Clone(dom), false, 0, shared), container.get(), (typeof scope.svg != 'undefined'));
+        OrnParser.Output(OrnParser.Process(OrnParser.Clone(dom), false, 0, shared), container.element(), (typeof scope.svg != 'undefined'));
 
     });
 
@@ -57,11 +57,11 @@ const Orns = (selector, scope, template) => {
             continue;
         }
 
-        var component = new Function([], `return ${element.get().identifier}`)();
+        var component = new Function([], `return ${element.element().identifier}`)();
 
-        var object = new component(element.get(), element.get().shared);
+        var object = new component(element.element(), element.element().shared);
 
-        element.get().component = object;
+        element.element().component = object;
 
         if (typeof object.Init != 'undefined') {
             object.Init();
@@ -79,7 +79,7 @@ const Orn = async(selector, scope, template) => {
 
     const container = new OrnCollection(selector);
 
-    const el = container.get();
+    const el = container.element();
 
     if (!el) {
         Orn.debug && console.log(`ORN: Container not found for selector "${selector}"`, scope, selector);
@@ -91,13 +91,13 @@ const Orn = async(selector, scope, template) => {
     if (typeof template != 'undefined') {
         template = new OrnTemplate(template);
     } else {
-        template = new OrnTemplate(container.get());
+        template = new OrnTemplate(container.element());
     }
 
     const vdom = await template.Process();
 
-    while (container.get().firstChild) {
-        container.get().removeChild(container.get().firstChild);
+    while (container.element().firstChild) {
+        container.element().removeChild(container.element().firstChild);
     }
 
     vdom.map((dom) => {
@@ -106,7 +106,7 @@ const Orn = async(selector, scope, template) => {
 
         var output = OrnParser.Process(OrnParser.Clone(dom), false, 0, shared);
 
-        OrnParser.Output(output, container.get(), (typeof scope.svg != 'undefined'));
+        OrnParser.Output(output, container.element(), (typeof scope.svg != 'undefined'));
 
     });
 
@@ -125,11 +125,11 @@ const Orn = async(selector, scope, template) => {
             element.attr('src', false, true);
         }
 
-        var component = new Function([], `return ${element.get().identifier}`)();
+        var component = new Function([], `return ${element.element().identifier}`)();
 
-        var object = new component(element.get(), element.get().shared);
+        var object = new component(element.element(), element.element().shared);
 
-        element.get().component = object;
+        element.element().component = object;
 
         if (typeof object.Init != 'undefined') {
             await object.Init();
@@ -610,7 +610,11 @@ class OrnCollection extends Array {
 
     }
 
-    get(i) {
+    get() {
+        return this;
+    }
+
+    element(i) {
         return this.length ? this[i ? i : 0] : false;
     }
 
@@ -640,10 +644,10 @@ class OrnCollection extends Array {
 
         var t = this;
 
-        var obj = new OrnCollection(Array.from(this.length && this.get().parentNode ? this.get().parentNode.children : []));
+        var obj = new OrnCollection(Array.from(this.length && this.element().parentNode ? this.element().parentNode.children : []));
 
         obj = obj.filter(function(item) {
-            return item != t.get() && item.matches(selector);
+            return item != t.element() && item.matches(selector);
         });
 
         return obj;
@@ -669,7 +673,7 @@ class OrnCollection extends Array {
     css(c, action) {
 
         if (typeof action == 'undefined') {
-            return this.length && this.get().classList.contains(c);
+            return this.length && this.element().classList.contains(c);
         }
 
         const parts = c.split(' ');
@@ -701,7 +705,7 @@ class OrnCollection extends Array {
     style(k, v) {
 
         if (typeof v == 'undefined') {
-            return this.get().style.getPropertyValue(k);
+            return this.element().style.getPropertyValue(k);
         }
 
         this.forEach((el) => {
@@ -785,7 +789,7 @@ class OrnCollection extends Array {
             if (!this.length) {
                 return '';
             }
-            return this.get().innerHTML;
+            return this.element().innerHTML;
         }
 
         this.forEach((e) => {
@@ -815,7 +819,7 @@ class OrnCollection extends Array {
 
         } else {
 
-            return this.get().getAttribute(k);
+            return this.element().getAttribute(k);
 
         }
 
@@ -889,7 +893,7 @@ class OrnCollection extends Array {
 
     offset(type) {
 
-        var el = this.get();
+        var el = this.element();
 
         return {
             width: el.offsetWidth,
@@ -913,10 +917,10 @@ class OrnCollection extends Array {
 
     ancestor(selector, element) {
 
-        let select = new OrnCollection(selector).get();
+        let select = new OrnCollection(selector).element();
 
         if (!element) {
-            element = this.get();
+            element = this.element();
         }
 
         var parent = element.parentNode;
