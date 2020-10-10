@@ -1,0 +1,82 @@
+<script src="../src/oriented.js"></script>
+<div id="test-component">
+
+
+    <orn-component identifier="TestOrnClass" orn-shared="{
+}">
+
+        <div>
+            <h3>{{label}}</h3>
+            <input type="text" orn-model="label" orn-value="label" />
+            <div orn-repeat="data.list as t:item">
+                <b>Name: {{item.name}} | ID: {{item.id}}</b>
+                <input type="text" orn-model="item.id" orn-value="item.id" placeholder="Enter ID" />
+                <textarea type="text" orn-model="item.name" orn-value="data.list[t].name"></textarea>
+                <select orn-model="item.name" orn-value="item.name">
+            <option orn-repeat="data.list as j:option" orn-value="option.name">{{option.name}}</option>
+        </select>
+            </div>
+
+        </div>
+
+    </orn-component>
+
+</div>
+<script>
+    class TestOrnClass {
+
+        constructor(container, shared) {
+
+            this.container = container;
+
+            this.label = shared.label;
+
+            this.data = {
+                list: [{
+                    name: 'External Item a'
+                }, {
+                    name: 'External Item b'
+                }, {
+                    name: 'External Item c'
+                }]
+            }
+
+        }
+
+        Init() {
+
+            Orns(this.container, this)
+        }
+
+    }
+
+    Orns('#test-component', {});
+
+    var component = Selector('#test-component orn-component').element().component;
+</script>
+<style>
+    input,
+    textarea,
+    select {
+        display: block;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        padding: 10px;
+        width: 100%;
+        border: 1px solid #ddd;
+        background: none;
+        font: inherit;
+    }
+    
+    .h-sep {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid;
+    }
+    
+    h3 {
+        padding: 0px;
+        margin: 0px;
+        margin-bottom: 10px;
+    }
+</style>
