@@ -1,4 +1,4 @@
-## OrientedJS
+## Orn JS
 
 https://orientedjs.com/
 

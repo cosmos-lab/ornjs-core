@@ -2,7 +2,7 @@
 
 /**
  * 
- * https://github.com/orientedjs/core 
+ * https://github.com/ornjs/core 
  * v2.0.0 Sep 4 2020
  * Achieve data driven dynamic HTML with the power of ECMAScript.
  * Parse inline or external file HTML template with a Javascript 'Class' object as scope.
