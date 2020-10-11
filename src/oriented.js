@@ -158,13 +158,15 @@ const Orn = async(selector, scope, template) => {
 
         var local = element.shared;
 
+        var args = [];
         if (scope instanceof Array) {
-            scope.push(local);
+            args = scope;
+            args.push(local);
         } else {
-            scope = [scope, local];
+            args = [scope, local];
         }
 
-        await Orn(element, scope, src);
+        await Orn(element, args, src);
 
         element._Loaded = true;
 
