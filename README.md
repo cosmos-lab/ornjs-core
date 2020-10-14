@@ -2,7 +2,7 @@
 
 https://orientedjs.com/
 
-OrientedJS is an object oriented approach to achive data driven dynamic HTML with the power of ECMAScript.
+OrientedJS is an object orn approach to achive data driven dynamic HTML with the power of ECMAScript.
 A radical approach to plan HTML based UI...
 
 - Specially designed for rapid PWA development.
@@ -108,7 +108,7 @@ For more templates and JS Class examples please visit https://orientedjs.com/
 
 - Bring beauty of new ECMAScript to your UI logics.
 
-- Achieve finest Object Oriented approach in UI logics.
+- Achieve finest Object Orn approach in UI logics.
 
 - Seprate HTML template for UI. Seprate JS and HTML for easy to maintain code.
 
