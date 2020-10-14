@@ -1,8 +1,8 @@
 ## Orn JS
 
-https://orientedjs.com/
+https://ornjs.com/
 
-OrientedJS is an object orn approach to achive data driven dynamic HTML with the power of ECMAScript.
+OrnJS is an object orn approach to achive data driven dynamic HTML with the power of ECMAScript.
 A radical approach to plan HTML based UI...
 
 - Specially designed for rapid PWA development.
@@ -64,7 +64,7 @@ class MyItemList {
 
     async Template() {
         /*
-        *This is the only place where OrientedJS is getting involved
+        *This is the only place where OrnJS is getting involved
         */
         await Orn(this.container, this);
     }
@@ -96,9 +96,9 @@ myobject.Init();
 
 ```
 
-For more templates and JS Class examples please visit https://orientedjs.com/
+For more templates and JS Class examples please visit https://ornjs.com/
 
-## Benefit of OrientedJS
+## Benefit of OrnJS
 
 - Gives you more control over your UI architecture.
 
