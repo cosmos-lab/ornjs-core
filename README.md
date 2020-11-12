@@ -2,7 +2,7 @@
 
 https://ornjs.com/
 
-OrnJS is an object orn approach to achive data driven dynamic HTML with the power of ECMAScript.
+OrnJS is an object orn approach to achieve data driven dynamic HTML with the power of ECMAScript.
 A radical approach to plan HTML based UI...
 
 - Specially designed for rapid PWA development.
