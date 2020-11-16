@@ -5,17 +5,6 @@ https://ornjs.com/
 OrnJS is an object orn approach to achieve data driven dynamic HTML with the power of ECMAScript.
 A radical approach to plan HTML based UI...
 
-- Specially designed for rapid PWA development.
-
-- Put HTML template in a seprate *.html file and encapsulate all UI logics/data/event handlers inside an ECMAScript class in a standard *.js javascript file. 
-Orn(container,scope,template) method will load html template over HTTP and render UI in 'container' with 'scope'.
-'container' could be any valid selector string or a DOM object. 'scope' can be any javascript object or 'this' of any javascript class.
-
-- Serve UI resources over HTTP via any webserver (Node.js, Apache or nginx).
-
-- Gives you more control over your UI architecture to design it in your own ways, because most of the application is driven by your ECMAScript classes. ORN is just to create a dynamic HTML into a container from scope data ('this' or any javascript object) & HTML template (inline or external *.html file).
-
-- Mix it with any stack of your existing project without making too much changes. e.g. Achieve data driven HTML in php, wordpress based websites or any PWA...
 
 ## Sample Template
 ```
