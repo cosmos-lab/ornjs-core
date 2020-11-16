@@ -85,21 +85,4 @@ myobject.Init();
 
 ```
 
-For more templates and JS Class examples please visit https://ornjs.com/
-
-## Benefit of OrnJS
-
-- Gives you more control over your UI architecture.
-
-- UI can be served from any HTTP container (Apache, Nodejs).
-
-- Super easy to maintain with cleaner code of mordern Javascript.
-
-- Bring beauty of new ECMAScript to your UI logics.
-
-- Achieve finest Object Orn approach in UI logics.
-
-- Seprate HTML template for UI. Seprate JS and HTML for easy to maintain code.
-
-- Write reusable UI component with beautiful code.
 
