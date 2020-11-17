@@ -5,6 +5,13 @@ https://ornjs.com/
 OrnJS is an object orn approach to achieve data driven dynamic HTML with the power of ECMAScript.
 A radical approach to plan HTML based UI...
 
+- No batch jobs, orn use Javascript "Proxy" to track changes in state, update UI
+
+- Supports data driven HTML/SVG
+
+- Achieve pure HTML based UI via single function Orn(container,scope,template)
+
+- Write most of UI logic in ECMA Class or VanilaJS. We just need a HTML template and a javascript object to trigger UI in a container.
 
 ## Sample Template
 ```
@@ -85,4 +92,21 @@ myobject.Init();
 
 ```
 
+For more templates and JS Class examples please visit https://ornjs.com/
+
+## Benefit of OrnJS
+
+- Gives you more control over your UI architecture.
+
+- UI can be served from any HTTP container (Apache, Nodejs).
+
+- Super easy to maintain with cleaner code of mordern Javascript.
+
+- Bring beauty of new ECMAScript to your UI logics.
+
+- Achieve finest Object Orn approach in UI logics.
+
+- Seprate HTML template for UI. Seprate JS and HTML for easy to maintain code.
+
+- Write reusable UI component with beautiful code.
 

@@ -337,19 +337,22 @@ Orn.Include = async(resource) => {
     }
 
     await new Promise((resolve, reject) => {
+        var isJS = src.match(/\.js/);
         Orn.Include.queue[src] = true;
-        const script = document.createElement('script');
-        script.onload = function() {
+        const node = document.createElement((isJS ? 'script' : 'img'));
+        node.onload = function() {
             delete Orn.Include.queue[src];
             resolve();
         };
-        script.onerror = function() {
+        node.onerror = function() {
             Orn.Include.queue[src] = 'ERROR';
             reject();
         };
-        script.async = true;
-        document.body.appendChild(script);
-        script.src = src;
+        node.async = true;
+        if(isJS){
+            document.body.appendChild(node);
+        }
+        node.src = src;
     });
 
 };
@@ -1020,21 +1023,19 @@ class OrnParser {
 
         if (tag === '#text') {
 
-            var match = node.text.match(/\{\{(.*?)\}\}/gi);
+            var template = node.text;
+
+            var match = template.match(/\{\{(.*?)\}\}/gi);
 
             if (match !== null) {
 
                 parser = new OrnParser(node, parent, index, false, scope);
-
-                var matches = [];
 
                 var keys = [];
 
                 for (var i = 0; i < match.length; i++) {
 
                     let ex = match[i].replace(/\{\{|\}\}/gi, '');
-
-                    matches.push(ex);
 
                     let __v = parser.Parse(ex);
 
@@ -1046,24 +1047,25 @@ class OrnParser {
 
                 }
 
-                node.__listen = ((parser, exps) => {
+                //Change listener of text nodes when state changes
+                node.__listen = ((parser, match,template) => {
                     return (el) => {
                         el.__listen = {
                             keys: keys,
                             target: () => {
+                                
+                                el.textContent = template;
 
-                                var text = '';
-
-                                for (var i = 0; i < exps.length; i++) {
-                                    text += ' ' + parser.Parse(exps[i]);
+                                for (var i = 0; i < match.length; i++) {
+                                    let ex = match[i].replace(/\{\{|\}\}/gi, '');
+                                    let __v = parser.Parse(ex);
+                                    el.textContent=  el.textContent.replace(match[i], __v);
                                 }
-
-                                el.textContent = text;
 
                             }
                         };
                     }
-                })(parser, matches);
+                })(parser, match,template);
 
             }
 
