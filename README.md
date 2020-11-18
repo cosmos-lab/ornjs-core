@@ -2,6 +2,9 @@
 
 https://ornjs.com/
 
+## Orn Philosophy
+Keep it simple & generic, developers can design complex UI with freedom to play via OOPs concepts. Craft most complex data driven HTML/SVG in least effort required and re-use it... Include a single file and setup is done! Orn is just a catalyst!
+
 ## Sample Template
 ```
 <div id="my-container" orn-module="my-item-list">
